@@ -1,4 +1,4 @@
-% [global_struct, packets, names] = json_reader('data2.json', true);
+[global_struct, packets, names] = json_reader('data2.json', true);
 
 
 close all
