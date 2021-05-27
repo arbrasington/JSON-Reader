@@ -1,0 +1,26 @@
+function [data] = get_data_by_name(array,names,getter)
+%% GET DATA FROM PARSED JSON ARRAY
+%   Use this function to get data from the parsed JSON array,
+%   by passing in the name of the data you want. The "array" variable
+%   should be the parsed array, "names" should be the names array
+%   returned from the JSON parser, and "getter" should be the name to 
+%   get from the array.
+
+labels = names(:,1);
+idxs = str2double(names(:,2));
+disp(labels)
+disp(idxs)
+data = array;
+
+if any(labels == getter) == 0
+    error('Invalid name, could not find key')
+end
+
+idx = find(labels == getter, 1);
+data = array(:,1:1);
+if idx == 1
+    data = array(:,1:idxs(idx));
+else
+    
+end
+
