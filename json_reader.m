@@ -5,7 +5,9 @@ function [global_struct,packets,names] = json_reader(filename, include_global)
 %  Global data is stored in global_struct in the format of
 %  a MATLAB data structure.
 %  Packet data is stored in "packets" variable as an array, 
-%  and keys from json file are stored in "names" variable.
+%  and keys from json file are stored in an array matrix under
+%  the "names" variable. This contains the names in the first column
+%  and their asscociated number of columns of data.
 
     %%  Open file and parse JSON data
     fid = fopen(filename); 
@@ -24,18 +26,20 @@ function [global_struct,packets,names] = json_reader(filename, include_global)
     %% Begin data extraction
     packet_struct = val{2,1};  % packet data structure
     packet_ids = fieldnames(packet_struct);
-    L = length(packet_ids)+1;  % length of array
+    L = length(packet_ids);  % length of array
 
     % find width of array here
     fn2 = packet_struct.(packet_ids{1});
     fn2_names = fieldnames(fn2);
-    W = 0;
-    names = {};
+    W = 0;  % initialize array width
+    names = [];  % initialize array of names
     for j=1:length(fn2_names)
-        names(j) = {fn2_names{j}};
-        W = W + length(fn2.(fn2_names{j}));
+        name = convertCharsToStrings(fn2_names{j});
+        len =  length(fn2.(fn2_names{j}));
+        names = [names; [name, len]];  % add name and length of data
+        W = W + len;
     end
-
+    
     packets = zeros(L, W);  % initialize array
 
     %% Set data in the array
@@ -47,7 +51,7 @@ function [global_struct,packets,names] = json_reader(filename, include_global)
         start = 1;
         for j=1:length(fn2_names)
             stop = start + length(fn2.(fn2_names{j}))-1;
-            packets(i+1, start:stop)=fn2.(fn2_names{j}).';
+            packets(i, start:stop)=fn2.(fn2_names{j}).';
             start = stop+1;
         end
     end
